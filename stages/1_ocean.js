@@ -10,7 +10,7 @@
 import { log } from "../utils/logger.js";
 import { sleep, withRetry } from "../utils/helpers.js";
 
-const BASE_URL = "https://api.ocean.io/v2";
+const BASE_URL = "https://api.ocean.io";
 const API_KEY = process.env.OCEAN_API_KEY;
 
 /**
@@ -31,10 +31,10 @@ export async function findLookalikeDomains(seedDomain) {
 
   try {
     const response = await withRetry(() =>
-      fetch(`${BASE_URL}/lookalikes/search`, {
+      fetch(`${BASE_URL}/lookalikes`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          "X-API-KEY": apiKey,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -53,8 +53,8 @@ export async function findLookalikeDomains(seedDomain) {
 
     const data = await response.json();
 
-    // Ocean.io returns { companies: [ { domain, name, ... }, ... ] }
-    const companies = data.companies ?? data.results ?? [];
+    // Ocean.io returns { lookalikes: [ { domain, name, ... }, ... ] }
+    const companies = data.lookalikes ?? data.companies ?? data.results ?? [];
 
     const domains = companies
       .map((c) => c.domain?.trim().toLowerCase())
