@@ -14,14 +14,17 @@ import { sleep, withRetry } from "../utils/helpers.js";
 
 const BASE_URL = "https://api.brevo.com/v3";
 const API_KEY = process.env.BREVO_API_KEY;
-const SENDER_NAME = process.env.SENDER_NAME ?? "Your Name";
-const SENDER_EMAIL = process.env.SENDER_EMAIL ?? "you@yourdomain.com";
+// Note: SENDER_NAME and SENDER_EMAIL are read from process.env in functions
+// to ensure they're loaded after dotenv runs
 
 /**
  * Build a personalized email for one contact.
  * Customize this copy — it's what they'll actually read.
  */
 function buildEmail(contact, seedDomain) {
+  const senderName = process.env.SENDER_NAME || "Your Name";
+  const senderEmail = process.env.SENDER_EMAIL || "you@yourdomain.com";
+  
   const firstName = contact.name.split(" ")[0];
   const companyName = contact.company ?? contact.domain;
 
@@ -44,8 +47,8 @@ we've built — would that be worth your time this week?</p>
 <p>Either way, keep up the great work at ${companyName}.</p>
 
 <p>Best,<br/>
-${SENDER_NAME}<br/>
-${SENDER_EMAIL}</p>
+${senderName}<br/>
+${senderEmail}</p>
   `.trim();
 
   const textBody = `
@@ -58,7 +61,7 @@ I'm reaching out because we help businesses automate their sales outreach — id
 Given your role as ${contact.title}, I suspect pipeline efficiency matters to you. Happy to show you a quick 10-minute demo — would that be worth your time this week?
 
 Best,
-${SENDER_NAME}
+${senderName}
   `.trim();
 
   return { subject, htmlBody, textBody };
@@ -69,8 +72,8 @@ ${SENDER_NAME}
  */
 async function sendOne(contact, seedDomain) {
   const apiKey = API_KEY || process.env.BREVO_API_KEY;
-  const senderName = SENDER_NAME || process.env.SENDER_NAME;
-  const senderEmail = SENDER_EMAIL || process.env.SENDER_EMAIL;
+  const senderName = process.env.SENDER_NAME || "Your Name";
+  const senderEmail = process.env.SENDER_EMAIL || "you@yourdomain.com";
   
   const { subject, htmlBody, textBody } = buildEmail(contact, seedDomain);
 
@@ -106,8 +109,8 @@ async function sendOne(contact, seedDomain) {
  */
 export async function sendOutreach(contacts, seedDomain) {
   const apiKey = API_KEY || process.env.BREVO_API_KEY;
-  const senderEmail = SENDER_EMAIL || process.env.SENDER_EMAIL;
-  const senderName = SENDER_NAME || process.env.SENDER_NAME;
+  const senderEmail = process.env.SENDER_EMAIL || "you@yourdomain.com";
+  const senderName = process.env.SENDER_NAME || "Your Name";
   
   if (!apiKey) {
     throw new Error("Missing BREVO_API_KEY in environment variables.");
