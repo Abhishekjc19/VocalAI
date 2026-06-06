@@ -82,10 +82,8 @@ async function fetchEmployeesForDomain(domain) {
       
       // Handle rate limiting with Retry-After header
       if (response.status === 429) {
-        const retryAfter = parseInt(response.headers.get("Retry-After") || "60") * 1000;
-        log.warn(`[Prospeo] ${domain} → Rate limited. Waiting ${retryAfter / 1000}s`);
-        await sleep(retryAfter);
-        continue; // Retry this page
+        log.warn(`[Prospeo] ${domain} → Rate limited. Using mock data for demo.`);
+        break; // Use mock data instead of waiting
       }
       
       log.warn(`[Prospeo] ${domain} → ${response.status}: ${err.slice(0, 200)}`);
@@ -160,7 +158,7 @@ export async function findDecisionMakers(domains) {
       log.warn(`[Prospeo] Skipping ${domain}: ${err.message}`);
     }
 
-    await sleep(7000); // Increased to 7 seconds to avoid rate limits
+    await sleep(1000); // Reduced from 7 seconds for faster demo
   }
 
   // If no prospects found at all, add some mock data
