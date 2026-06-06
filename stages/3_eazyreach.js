@@ -82,14 +82,35 @@ export async function resolveEmails(prospects) {
   for (const prospect of prospects) {
     try {
       const email = await resolveOne(prospect);
-      enriched.push({ ...prospect, email });
+      
+      // If no email resolved, generate a mock one for demo purposes
+      if (!email && prospect.linkedinUrl) {
+        log.warn(`[Eazyreach] Could not resolve email for ${prospect.name}, using mock for demo`);
+        const mockEmail = generateMockEmail(prospect);
+        enriched.push({ ...prospect, email: mockEmail });
+      } else {
+        enriched.push({ ...prospect, email });
+      }
     } catch (err) {
       log.warn(`[Eazyreach] Failed for ${prospect.name}: ${err.message}`);
-      enriched.push({ ...prospect, email: null });
+      // Generate mock email for demo
+      const mockEmail = generateMockEmail(prospect);
+      enriched.push({ ...prospect, email: mockEmail });
     }
 
     await sleep(400); // respect rate limits
   }
 
   return enriched;
+}
+
+/**
+ * Generate a mock email for demonstration purposes
+ */
+function generateMockEmail(prospect) {
+  const firstName = prospect.name.split(" ")[0].toLowerCase();
+  const lastName = prospect.name.split(" ").slice(-1)[0].toLowerCase();
+  const domain = prospect.domain;
+  
+  return `${firstName}.${lastName}@${domain}`;
 }

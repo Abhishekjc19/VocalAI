@@ -107,11 +107,12 @@ async function sendOne(contact, seedDomain) {
 export async function sendOutreach(contacts, seedDomain) {
   const apiKey = API_KEY || process.env.BREVO_API_KEY;
   const senderEmail = SENDER_EMAIL || process.env.SENDER_EMAIL;
+  const senderName = SENDER_NAME || process.env.SENDER_NAME;
   
   if (!apiKey) {
     throw new Error("Missing BREVO_API_KEY in environment variables.");
   }
-  if (!senderEmail || senderEmail === "you@yourdomain.com") {
+  if (!senderEmail || senderEmail === "you@yourdomain.com" || !senderEmail.includes("@")) {
     throw new Error(
       "Set SENDER_EMAIL and SENDER_NAME env vars to your verified Brevo sender."
     );
